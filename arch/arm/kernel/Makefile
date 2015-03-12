@@ -86,3 +86,5 @@ obj-$(CONFIG_ARM_VIRT_EXT)	+= hyp-stub.o
 obj-$(CONFIG_ARM_PSCI)		+= psci.o
 
 extra-y := $(head-y) vmlinux.lds
+
+obj-$(CONFIG_MAKO_HOTPLUG)	+= mako_hotplug.o
