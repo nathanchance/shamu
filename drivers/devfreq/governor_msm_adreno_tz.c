@@ -316,6 +316,8 @@ static int tz_suspend(struct devfreq *devfreq)
 
 	__secure_tz_entry2(TZ_RESET_ID, 0, 0);
 
+	__secure_tz_entry2(TZ_RESET_ID, 0, 0);
+
 	priv->bin.total_time = 0;
 	priv->bin.busy_time = 0;
 	priv->bus.total_time = 0;
