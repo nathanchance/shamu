@@ -66,7 +66,7 @@
 #include <linux/msm_tsens.h>
 #endif /* defined(CONFIG_THERMAL_TSENS8974)... */
 
-#define ENABLE_INPUTBOOSTER			// ZZ: enable/disable inputbooster support
+// #define ENABLE_INPUTBOOSTER			// ZZ: enable/disable inputbooster support
 // #define ENABLE_WORK_RESTARTLOOP		// ZZ: enable/disable restart loop for touchboost (DO NOT ENABLE IN THIS VERSION -> NOT STABLE YET!)
 
 #ifdef ENABLE_INPUTBOOSTER
@@ -81,13 +81,13 @@
 #define MAX_CORES					(4)
 
 // ZZ: enable/disable hotplug support
-#define ENABLE_HOTPLUGGING
+// #define ENABLE_HOTPLUGGING
 
 // ZZ: enable support for native hotplugging on snapdragon platform
-#define SNAP_NATIVE_HOTPLUGGING
+// #define SNAP_NATIVE_HOTPLUGGING
 
 // ZZ: enable for sources with backported cpufreq implementation of 3.10 kernel
-#define CPU_IDLE_TIME_IN_CPUFREQ
+// #define CPU_IDLE_TIME_IN_CPUFREQ
 
 // ZZ: enable/disable music limits
 #define ENABLE_MUSIC_LIMITS
@@ -8426,11 +8426,13 @@ static void do_dbs_timer(struct work_struct *work)
 
 #ifdef ENABLE_SNAP_THERMAL_SUPPORT
 	if (dbs_tuners_ins.scaling_trip_temp > 0) {
-		if (!suspend_flag)
+		if (!suspend_flag) {
 			tmu_check_delay = DEF_TMU_CHECK_DELAY;
-		else
+		} else {
 			tmu_check_delay = DEF_TMU_CHECK_DELAY_SLEEP;
-		schedule_delayed_work(&work_tmu_check, msecs_to_jiffies(tmu_check_delay));
+			if (cpu == 0)								// ZZ: only start temp reading work if we are on core 0 to avoid re-scheduling on every gov reload during hotplugging
+				schedule_delayed_work(&work_tmu_check, msecs_to_jiffies(tmu_check_delay));
+		}
 	} else {
 		tt_reset();
 	}
@@ -8761,7 +8763,7 @@ void zzmoove_resume(void)
 #endif /* ZZMOOVE_DEBUG */
 }
 
-#if defined(CONFIG_HAS_EARLYSUSPEND) && !defined(USE_LCD_NOTIFIER) && !defined (DISABLE_POWER_MANAGEMENT)
+#if defined(CONFIG_HAS_EARLYSUSPEND) && !defined(USE_LCD_NOTIFIER) && !defined(DISABLE_POWER_MANAGEMENT)
 static struct early_suspend __refdata _powersave_early_suspend = {
   .suspend = powersave_early_suspend,
   .resume = powersave_late_resume,
@@ -8945,6 +8947,9 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 		    if (!policy->cpu && dbs_tuners_ins.inputboost_cycles)
 			input_unregister_handler(&interactive_input_handler);
 #endif /* ENABLE_INPUTBOOST */
+#ifdef ENABLE_SNAP_THERMAL_SUPPORT
+		    cancel_delayed_work(&work_tmu_check);				// ZZ: cancel cpu temperature reading when leaving the governor
+#endif /* ENABLE_SNAP_THERMAL_SUPPORT */
 #if (defined(CONFIG_HAS_EARLYSUSPEND) || defined(CONFIG_POWERSUSPEND) && !defined(DISABLE_POWER_MANAGEMENT)) || defined(USE_LCD_NOTIFIER)
 		    dbs_tuners_ins.disable_sleep_mode = DEF_DISABLE_SLEEP_MODE;
 #endif /* (defined(CONFIG_HAS_EARLYSUSPEND)... */
@@ -9139,4 +9144,3 @@ fs_initcall(cpufreq_gov_dbs_init);
 module_init(cpufreq_gov_dbs_init);
 #endif /* CONFIG_CPU_FREQ_DEFAULT_GOV_ZZMOOVE */
 module_exit(cpufreq_gov_dbs_exit);
-
