@@ -4972,7 +4972,7 @@
 
 	qcom,bcl {
 		compatible = "qcom,bcl";
-		qcom,bcl-disable;
+		qcom,bcl-enable;
 		qcom,ibat-vadc = <&pma8084_vadc>;
 		qcom,ibat-threshold-adc_tm = <&pma8084_adc_tm>;
 		qcom,ibat-monitor {
