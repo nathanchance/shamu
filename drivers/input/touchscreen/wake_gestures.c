@@ -37,7 +37,7 @@
 /* Tuneables */
 #define WG_DEBUG		0
 #define WG_DEFAULT		0
-#define S2W_DEFAULT		0
+#define S2W_DEFAULT		12
 #define S2S_DEFAULT		0
 #define WG_PWRKEY_DUR           100
 
@@ -64,7 +64,7 @@
 #define SWEEP_LEFT		0x02
 #define SWEEP_UP		0x04
 #define SWEEP_DOWN		0x08
-#define VIB_STRENGTH 		20
+#define VIB_STRENGTH 		27
 
 
 #define WAKE_GESTURES_ENABLED	1
@@ -79,7 +79,7 @@ static struct input_dev *gesture_dev;
 /* Resources */
 int s2w_switch = S2W_DEFAULT;
 bool dt2w_switch;
-int camera_switch;
+int camera_switch = 1;
 static bool camera = false;
 static int s2s_switch = S2S_DEFAULT;
 static int touch_x = 0, touch_y = 0;
